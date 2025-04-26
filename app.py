@@ -225,8 +225,10 @@ if filtered_data is not None and not filtered_data.empty:
         selected_topic = st.selectbox("Select Topic to View", options=topics)
         
         # Get the terms for the selected topic
-        topic_idx = int(selected_topic.split()[-1])
-        topic_words = st.session_state.topic_terms[topic_idx-1]  # Adjust for 0-based indexing
+        # Find the index of the selected topic in the list of unique topics
+        topics_list = sorted(filtered_data['topic'].unique().tolist())
+        topic_idx = topics_list.index(selected_topic)
+        topic_words = st.session_state.topic_terms[topic_idx]
         
         # Display word cloud for selected topic
         st.pyplot(create_wordcloud_for_topic(topic_words))
