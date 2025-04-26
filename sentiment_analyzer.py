@@ -6,6 +6,9 @@ import re
 # Download required NLTK resources
 nltk.download('vader_lexicon', quiet=True)
 
+# Set NLTK data path
+nltk.data.path.append('/home/runner/nltk_data')
+
 def clean_text(text):
     """
     Clean text data by removing URLs, special characters, etc.

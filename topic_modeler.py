@@ -12,6 +12,9 @@ nltk.download('stopwords', quiet=True)
 nltk.download('wordnet', quiet=True)
 nltk.download('punkt', quiet=True)
 
+# Set NLTK data path
+nltk.data.path.append('/home/runner/nltk_data')
+
 def preprocess_text(text):
     """
     Preprocess text for topic modeling
@@ -42,16 +45,40 @@ def preprocess_text(text):
     text = re.sub(r'[^\w\s]', '', text)
     text = re.sub(r'\d+', '', text)
     
-    # Tokenize
-    tokens = nltk.word_tokenize(text)
+    # Simple tokenization to avoid NLTK punkt issues
+    tokens = text.split()
     
     # Remove stopwords
-    stop_words = set(stopwords.words('english'))
+    try:
+        stop_words = set(stopwords.words('english'))
+    except:
+        # Fallback stopwords if NLTK data is not available
+        stop_words = set(['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 
+                           'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 
+                           'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 
+                           'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 
+                           'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 
+                           'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 
+                           'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 
+                           'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 
+                           'with', 'about', 'against', 'between', 'into', 'through', 'during', 
+                           'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 
+                           'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 
+                           'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 
+                           'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 
+                           'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 
+                           'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 
+                           'should', 'now'])
+    
     tokens = [token for token in tokens if token not in stop_words]
     
     # Lemmatize
-    lemmatizer = WordNetLemmatizer()
-    tokens = [lemmatizer.lemmatize(token) for token in tokens]
+    try:
+        lemmatizer = WordNetLemmatizer()
+        tokens = [lemmatizer.lemmatize(token) for token in tokens]
+    except:
+        # Skip lemmatization if NLTK is not available
+        pass
     
     # Join tokens back into a string
     text = ' '.join(tokens)
