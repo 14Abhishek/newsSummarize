@@ -80,7 +80,7 @@ from_date = st.sidebar.date_input("From Date", month_ago)
 to_date = st.sidebar.date_input("To Date", today)
 
 # Sources and language filter
-sources = st.sidebar.text_input("Sources (comma-separated)", "")
+sources = st.sidebar.text_input("Sources (domain or URL, e.g. bbc.com or https://www.bbc.com)", "")
 language_options = {
     "English": "en",
     "Spanish": "es",

@@ -51,7 +51,19 @@ def fetch_news(api_key, query, from_date=None, to_date=None, sources="", languag
         if to_date_str:
             params['to'] = to_date_str
         if sources:
-            params['sources'] = sources
+            # Check if sources is a URL or domain name
+            if sources.startswith('http://') or sources.startswith('https://'):
+                # Extract domain name from URL
+                from urllib.parse import urlparse
+                domain = urlparse(sources).netloc
+                if domain.startswith('www.'):
+                    domain = domain[4:]  # Remove 'www.' prefix
+                params['domains'] = domain
+            elif '.' in sources:  # Likely a domain name
+                params['domains'] = sources
+            else:
+                # Assume it's a comma-separated list of source IDs
+                params['sources'] = sources
             
         # Make the API request
         response = requests.get('https://newsapi.org/v2/everything', params=params)
