@@ -167,10 +167,48 @@ def perform_topic_modeling(df, num_topics=5, num_words=10, min_df=2, max_df=0.95
         
         # Get topic terms
         topic_terms = []
+        topic_names = []
+        
         for topic_idx, topic in enumerate(lda.components_):
             top_features_idx = topic.argsort()[:-num_words-1:-1]
             top_features = [feature_names[i] for i in top_features_idx]
             topic_terms.append(top_features)
+            
+            # Generate a descriptive topic name based on top words
+            # Use the first 2-3 most representative words
+            key_terms = top_features[:2]
+            
+            # Map common keywords to topic categories
+            topic_categories = {
+                'business': ['business', 'market', 'economy', 'stock', 'company', 'finance', 'economic', 'trade', 'financial', 'investment'],
+                'technology': ['tech', 'technology', 'digital', 'software', 'computer', 'app', 'mobile', 'device', 'internet', 'online', 'ai', 'artificial'],
+                'politics': ['politics', 'government', 'election', 'president', 'minister', 'political', 'vote', 'policy', 'campaign', 'party', 'leader'],
+                'sports': ['sports', 'game', 'match', 'team', 'player', 'win', 'football', 'soccer', 'league', 'championship', 'score', 'tournament'],
+                'entertainment': ['entertainment', 'film', 'movie', 'music', 'artist', 'actor', 'actress', 'celebrity', 'show', 'tv', 'television'],
+                'science': ['science', 'research', 'study', 'scientific', 'discovery', 'researcher', 'scientist', 'physics', 'chemistry', 'biology'],
+                'health': ['health', 'medical', 'doctor', 'patient', 'disease', 'treatment', 'hospital', 'drug', 'medicine', 'vaccine', 'healthcare'],
+                'environment': ['environment', 'climate', 'environmental', 'energy', 'sustainable', 'green', 'pollution', 'renewable', 'carbon'],
+                'education': ['education', 'student', 'school', 'university', 'college', 'teacher', 'learning', 'academic', 'degree', 'classroom'],
+                'social': ['social', 'media', 'facebook', 'twitter', 'instagram', 'platform', 'user', 'content', 'post', 'share']
+            }
+            
+            # Check if any of the top words match known categories
+            matched_category = None
+            for category, keywords in topic_categories.items():
+                for word in top_features[:5]:  # Check first 5 words
+                    if word in keywords:
+                        matched_category = category.capitalize()
+                        break
+                if matched_category:
+                    break
+                    
+            if matched_category:
+                topic_name = f"{matched_category}"
+            else:
+                # Use the top 2 words if no category matched
+                topic_name = f"{key_terms[0].capitalize()} & {key_terms[1]}"
+                
+            topic_names.append(topic_name)
         
         # Transform documents to get topic distributions
         doc_topic_dist = lda.transform(dtm)
@@ -179,20 +217,24 @@ def perform_topic_modeling(df, num_topics=5, num_words=10, min_df=2, max_df=0.95
         topics = np.argmax(doc_topic_dist, axis=1)
         
         # Initialize all documents with a default topic
-        df_topics['topic'] = 'Topic 1'
+        df_topics['topic'] = topic_names[0] if topic_names else 'General'
         
         # Assign topics to valid documents
         valid_indices_list = valid_indices[valid_indices].index.tolist()
         for i, topic_idx in enumerate(topics):
             if i < len(valid_indices_list):
                 doc_idx = valid_indices_list[i]
-                df_topics.at[doc_idx, 'topic'] = f'Topic {topic_idx+1}'
+                if topic_idx < len(topic_names):
+                    df_topics.at[doc_idx, 'topic'] = topic_names[topic_idx]
+                else:
+                    df_topics.at[doc_idx, 'topic'] = f'Topic {topic_idx+1}'
         
     except Exception as e:
         print(f"Error in topic modeling: {e}")
         # Assign default topic
-        df_topics['topic'] = 'Topic 1'
+        df_topics['topic'] = 'General'
         topic_terms = [["error", "in", "topic", "modeling"]]
+        topic_names = ['General']
     
     # Drop intermediate column
     df_topics = df_topics.drop(columns=['text_for_topics'])
