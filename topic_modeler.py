@@ -175,13 +175,13 @@ def perform_topic_modeling(df, num_topics=5, num_words=10, min_df=2, max_df=0.95
             topic_terms.append(top_features)
             
             # Generate a descriptive topic name based on top words
-            # Use the first 2-3 most representative words
-            key_terms = top_features[:2]
+            # Use the first 3-4 most representative words for better context
+            key_terms = top_features[:3]
             
-            # Map common keywords to topic categories
+            # Map common keywords to topic categories with expanded keywords
             topic_categories = {
                 'business': ['business', 'market', 'economy', 'stock', 'company', 'finance', 'economic', 'trade', 'financial', 'investment'],
-                'technology': ['tech', 'technology', 'digital', 'software', 'computer', 'app', 'mobile', 'device', 'internet', 'online', 'ai', 'artificial'],
+                'technology': ['tech', 'technology', 'digital', 'software', 'computer', 'app', 'mobile', 'device', 'internet', 'online', 'ai', 'artificial', 'electric', 'electronic', 'smart', 'innovation'],
                 'politics': ['politics', 'government', 'election', 'president', 'minister', 'political', 'vote', 'policy', 'campaign', 'party', 'leader'],
                 'sports': ['sports', 'game', 'match', 'team', 'player', 'win', 'football', 'soccer', 'league', 'championship', 'score', 'tournament'],
                 'entertainment': ['entertainment', 'film', 'movie', 'music', 'artist', 'actor', 'actress', 'celebrity', 'show', 'tv', 'television'],
@@ -205,8 +205,8 @@ def perform_topic_modeling(df, num_topics=5, num_words=10, min_df=2, max_df=0.95
             if matched_category:
                 topic_name = f"{matched_category}"
             else:
-                # Use the top 2 words if no category matched
-                topic_name = f"{key_terms[0].capitalize()} & {key_terms[1]}"
+                # Use "Other" category with context if no specific category matched
+                topic_name = f"Other ({key_terms[0].capitalize()})"
                 
             topic_names.append(topic_name)
         
