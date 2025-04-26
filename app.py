@@ -31,6 +31,9 @@ if 'last_update_time' not in st.session_state:
     
 if 'update_frequency' not in st.session_state:
     st.session_state.update_frequency = 60  # Default: update every 60 minutes
+    
+if 'topic_terms' not in st.session_state:
+    st.session_state.topic_terms = [["no", "topics", "yet"]]  # Default empty topic terms
 
 def fetch_and_process_news(query, from_date, to_date, sources, language, sort_by, update_freq):
     """Fetch news data and process it with sentiment analysis and topic modeling"""
@@ -184,7 +187,7 @@ if (search_button or
     )
     
     if result:
-        st.session_state.news_data, topic_terms = result
+        st.session_state.news_data, st.session_state.topic_terms = result
         filtered_data = st.session_state.news_data  # On initial load, no filters applied
 
 # Display data and visualizations if data is available
@@ -223,7 +226,7 @@ if filtered_data is not None and not filtered_data.empty:
         
         # Get the terms for the selected topic
         topic_idx = int(selected_topic.split()[-1])
-        topic_words = topic_terms[topic_idx-1]  # Adjust for 0-based indexing
+        topic_words = st.session_state.topic_terms[topic_idx-1]  # Adjust for 0-based indexing
         
         # Display word cloud for selected topic
         st.pyplot(create_wordcloud_for_topic(topic_words))
