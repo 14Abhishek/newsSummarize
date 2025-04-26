@@ -39,7 +39,8 @@ def fetch_and_process_news(query, from_date, to_date, sources, language, sort_by
     """Fetch news data and process it with sentiment analysis and topic modeling"""
     with st.spinner('Fetching and analyzing news data...'):
         # Get API key from environment variable
-        api_key = os.getenv("NEWS_API_KEY")
+        # api_key = os.getenv("NEWS_API_KEY")
+        api_key = "e9de02389a4c4ed58b98a53251ba15e4"  # Use
         if not api_key:
             st.error("NEWS_API_KEY environment variable is not set. Please set it to use the NewsAPI.")
             return None
